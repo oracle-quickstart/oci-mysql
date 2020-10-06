@@ -14,15 +14,6 @@ data "template_file" "ad_names" {
   template = "${lookup(data.oci_identity_availability_domains.ad.availability_domains[count.index], "name")}"
 }
 
-data "oci_core_images" "images_for_shape" {
-    compartment_id = "${var.compartment_ocid}"
-    operating_system = "Oracle Linux"
-    operating_system_version = "8"
-    shape = "${var.node_shape}"
-    sort_by = "TIMECREATED"
-    sort_order = "DESC"
-}
-
 resource "oci_core_virtual_network" "mysqlvcn" {
   cidr_block = var.vcn_cidr
   compartment_id = var.compartment_ocid
@@ -187,7 +178,7 @@ module "mysql-shell" {
   availability_domain = "${data.template_file.ad_names.*.rendered[0]}"
   compartment_ocid    = "${var.compartment_ocid}"
   display_name        = "MySQLShellBastion"
-  image_id            = var.node_image_id == "" ? "${data.oci_core_images.images_for_shape.images[0].id}" : "${var.node_image_id}"
+  image_id            = "${var.node_image_id}"
   shape               = "${var.node_shape}"
   label_prefix        = "${var.label_prefix}"
   subnet_id           = "${oci_core_subnet.public.id}"
@@ -200,9 +191,10 @@ module "mysql-innodb-cluster" {
   number_of_nodes       = "${var.number_of_nodes}"
   source                = "./modules/mysql-innodb-cluster"
   availability_domains  = "${data.template_file.ad_names.*.rendered}"
+  use_ad                = false
   compartment_ocid      = "${var.compartment_ocid}"
   node_display_name     = "${var.node_display_name}"
-  image_id              = var.node_image_id == "" ? "${data.oci_core_images.images_for_shape.images[0].id}" : "${var.node_image_id}"
+  image_id              = "${var.node_image_id}"
   shape                 = "${var.node_shape}"
   label_prefix          = "${var.label_prefix}"
   subnet_id             = "${oci_core_subnet.private.id}"
