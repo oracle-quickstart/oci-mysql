@@ -163,7 +163,7 @@ resource "oci_core_subnet" "public" {
   compartment_id = var.compartment_ocid
   vcn_id = oci_core_virtual_network.mysqlvcn.id
   route_table_id = oci_core_route_table.public_route_table.id
-  security_list_ids = [oci_core_security_list.public_security_list.id, oci_core_security_list.private_security_list.id]
+  security_list_ids = [oci_core_security_list.public_security_list.id]
   dhcp_options_id = oci_core_virtual_network.mysqlvcn.default_dhcp_options_id
   dns_label = "mysqlpub"
 }
@@ -175,7 +175,7 @@ resource "oci_core_subnet" "private" {
   compartment_id             = var.compartment_ocid
   vcn_id                     = oci_core_virtual_network.mysqlvcn.id
   route_table_id             = oci_core_route_table.private_route_table.id
-  security_list_ids          = ["${oci_core_security_list.private_security_list.id}"]
+  security_list_ids          = [oci_core_security_list.private_security_list.id]
   dhcp_options_id            = oci_core_virtual_network.mysqlvcn.default_dhcp_options_id
   prohibit_public_ip_on_vnic = "true"
   dns_label                  = "mysqlpriv"
@@ -195,6 +195,9 @@ module "mysql-shell" {
   bastion_private_key = var.ssh_private_key_path == "" ? tls_private_key.public_private_key_pair.private_key_pem : file(var.ssh_private_key_path)  
 }
 
+# for a always free trier without NAT gateway you must have the following settings:
+# subnet_id             = oci_core_subnet.public.id
+# assign_public_ip      = "true"
 module "mysql-innodb-cluster" {
   number_of_nodes       = var.number_of_nodes
   source                = "./modules/mysql-innodb-cluster"
@@ -204,7 +207,7 @@ module "mysql-innodb-cluster" {
   image_id              = var.node_image_id == "" ? data.oci_core_images.images_for_shape.images[0].id : var.node_image_id
   shape                 = var.node_shape
   label_prefix          = var.label_prefix
-  subnet_id             = oci_core_subnet.public.id
+  subnet_id             = oci_core_subnet.private.id
   cluster_name          = var.cluster_name
   clusteradmin_password = var.clusteradmin_password
   ssh_authorized_keys   = var.ssh_authorized_keys_path == "" ? tls_private_key.public_private_key_pair.public_key_openssh : file(var.ssh_authorized_keys_path)
