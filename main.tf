@@ -31,13 +31,11 @@ resource "oci_core_internet_gateway" "internet_gateway" {
 }
 
 # for a always free trier comment the following resource
-/*
 resource "oci_core_nat_gateway" "nat_gateway" {
   compartment_id = var.compartment_ocid
   vcn_id         = oci_core_virtual_network.mysqlvcn.id
   display_name   = "nat_gateway"
 }
-*/
 
 resource "oci_core_route_table" "public_route_table" {
   compartment_id = var.compartment_ocid
@@ -50,7 +48,6 @@ resource "oci_core_route_table" "public_route_table" {
 }
 
 # for a always free trier comment the following resource
-/*
 resource "oci_core_route_table" "private_route_table" {
   compartment_id = var.compartment_ocid
   vcn_id         = oci_core_virtual_network.mysqlvcn.id
@@ -60,7 +57,6 @@ resource "oci_core_route_table" "private_route_table" {
     network_entity_id = oci_core_nat_gateway.nat_gateway.id
   }
 }
-*/
 
 resource "oci_core_security_list" "public_security_list" {
   compartment_id = var.compartment_ocid
@@ -173,7 +169,6 @@ resource "oci_core_subnet" "public" {
 }
 
 # for a always free trier comment the following resource
-/*
 resource "oci_core_subnet" "private" {
   cidr_block                 = cidrsubnet(var.vcn_cidr, 8, 1)
   display_name               = "mysql_private_subnet"
@@ -185,7 +180,6 @@ resource "oci_core_subnet" "private" {
   prohibit_public_ip_on_vnic = "true"
   dns_label                  = "mysqlpriv"
 }
-*/
 
 module "mysql-shell" {
   source              = "./modules/mysql-shell"
