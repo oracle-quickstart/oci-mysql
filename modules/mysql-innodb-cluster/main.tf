@@ -4,10 +4,10 @@ data "template_file" "install_mysql" {
   template = file("${path.module}/scripts/install_mysql.sh")
 
   vars = {
-    mysql_version         = "${var.mysql_version}"
-    cluster_name          = "${var.cluster_name}"
-    clusteradmin_password = "${var.clusteradmin_password}"
-    bastion_ip            = "${var.bastion_ip}"
+    mysql_version         = var.mysql_version
+    cluster_name          = var.cluster_name
+    clusteradmin_password = var.clusteradmin_password
+    bastion_ip            = var.bastion_ip
   }
 }
 
@@ -15,10 +15,10 @@ data "template_file" "install_cluster" {
   template = file("${path.module}/scripts/install_cluster.sh")
 
   vars = {
-    mysql_version         = "${var.mysql_version}"
-    cluster_name          = "${var.cluster_name}"
-    clusteradmin_password = "${var.clusteradmin_password}"
-    bastion_ip            = "${var.bastion_ip}"
+    mysql_version         = var.mysql_version
+    cluster_name          = var.cluster_name
+    clusteradmin_password = var.clusteradmin_password
+    bastion_ip            = var.bastion_ip
   }
 }
 
@@ -31,7 +31,7 @@ locals {
 ## MYSQL REPLICATION MASTER INSTANCE
 resource "oci_core_instance" "TFMysqlInnoDBCluterNode" {
   count               = var.number_of_nodes
-  availability_domain = var.use_AD == false ? "${var.availability_domains[0]}" : "${var.availability_domains[count.index%length(var.availability_domains)]}"
+  availability_domain = var.use_AD == false ? var.availability_domains[0] : var.availability_domains[count.index%length(var.availability_domains)]
   fault_domain        = var.use_AD == true ? "FAULT-DOMAIN-1" : "FAULT-DOMAIN-${(count.index  % local.fault_domains_per_ad) +1}"
   compartment_id      = var.compartment_ocid
   display_name        = "${var.label_prefix}${var.node_display_name}${count.index+1}"
@@ -45,7 +45,7 @@ resource "oci_core_instance" "TFMysqlInnoDBCluterNode" {
   }
 
   metadata = {
-    ssh_authorized_keys = "${file("${var.bastion_public_key}")}"
+    ssh_authorized_keys = var.bastion_public_key
   }
 
   source_details {
@@ -63,11 +63,11 @@ resource "oci_core_instance" "TFMysqlInnoDBCluterNode" {
       agent       = false
       timeout     = "5m"
       user        = var.vm_user
-      private_key = file("${var.bastion_private_key}")
+      private_key = var.bastion_private_key
 
       bastion_host = var.bastion_ip
       bastion_user = var.vm_user
-      bastion_private_key = file("${var.ssh_private_key}")
+      bastion_private_key = var.ssh_private_key
     }
   }
 
@@ -81,11 +81,11 @@ resource "oci_core_instance" "TFMysqlInnoDBCluterNode" {
       agent       = false
       timeout     = "5m"
       user        = var.vm_user
-      private_key = file("${var.bastion_private_key}")
+      private_key = var.bastion_private_key
 
       bastion_host = var.bastion_ip
       bastion_user = var.vm_user
-      bastion_private_key = file("${var.ssh_private_key}")
+      bastion_private_key = var.ssh_private_key
     }
 
   }
@@ -96,11 +96,11 @@ resource "oci_core_instance" "TFMysqlInnoDBCluterNode" {
       agent       = false
       timeout     = "5m"
       user        = var.vm_user
-      private_key = file("${var.bastion_private_key}")
+      private_key = var.bastion_private_key
 
       bastion_host = var.bastion_ip
       bastion_user = var.vm_user
-      bastion_private_key = file("${var.ssh_private_key}")
+      bastion_private_key = var.ssh_private_key
     }
    
     inline = [
@@ -117,11 +117,11 @@ resource "oci_core_instance" "TFMysqlInnoDBCluterNode" {
       agent       = false
       timeout     = "5m"
       user        = var.vm_user
-      private_key = file("${var.bastion_private_key}")
+      private_key = var.bastion_private_key
 
       bastion_host = var.bastion_ip
       bastion_user = var.vm_user
-      bastion_private_key = file("${var.ssh_private_key}")
+      bastion_private_key = var.ssh_private_key
     }
    
     inline = [
