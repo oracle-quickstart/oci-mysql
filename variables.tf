@@ -40,6 +40,11 @@ variable "label_prefix" {
   default     = ""
 }
 
+variable "mysql_version" {
+  description = "The version of the Mysql community server."
+  default     = "8.0.22"
+}
+
 variable "cluster_subnet_id" {
   description = "List of MySQL Shell subnets' id"
   default     = []
@@ -110,3 +115,8 @@ variable "private_key_path" {
   default     = ""
 }
 
+variable "open_router" {
+  description = "Open MySQL Classic and MySQL X Protocol on the router for the public IP (6446, 6447, 64460, 64470)"
+  default     = false
+}
+  
